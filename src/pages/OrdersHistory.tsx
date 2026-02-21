@@ -59,7 +59,7 @@ const OrdersHistory = () => {
                         <span className="font-mono text-sm font-bold text-primary">#{order.id}</span>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          {new Date(order.date).toLocaleDateString("pt-BR")}
+                          {new Date(order.created_at).toLocaleDateString("pt-BR")}
                         </div>
                       </div>
                       <Badge variant={order.status === "pago" ? "default" : "secondary"}>

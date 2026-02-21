@@ -12,23 +12,15 @@ const Cart = () => {
   const { createOrder } = useOrders();
   const navigate = useNavigate();
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!user) {
       toast.info("Acesse sua conta para finalizar a compra.");
       navigate("/auth");
       return;
     }
-
-    try {
-      const shipping = totalPrice >= 199 ? 0 : 19.90;
-      await createOrder(user.id, items, totalPrice + shipping, "Endereço Padrão (Mock)");
-      clearCart();
-      toast.success("Pedido realizado com sucesso!");
-      navigate("/pedidos");
-    } catch (e) {
-      toast.error("Ocorreu um erro ao processar o seu pedido.");
-    }
+    navigate("/checkout");
   };
+
 
 
   if (items.length === 0) {

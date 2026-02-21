@@ -16,6 +16,7 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Auth from "./pages/Auth";
+import Checkout from "./pages/Checkout";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrdersHistory from "./pages/OrdersHistory";
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,7 @@ const App = () => (
                     <Route path="/produto/:id" element={<ProductDetail />} />
                     <Route path="/carrinho" element={<Cart />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/checkout" element={<Checkout />} />
                     <Route path="/pedidos" element={<OrdersHistory />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="*" element={<NotFound />} />
@@ -55,5 +57,6 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
+
 
 export default App;

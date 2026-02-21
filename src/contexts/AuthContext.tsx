@@ -1,17 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface User {
   id: string;
   name: string;
   email: string;
   avatar?: string;
+  role?: 'admin' | 'user';
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, pass: string) => Promise<void>;
   register: (name: string, email: string, pass: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -22,57 +25,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check localStorage on mount
-    const savedUser = localStorage.getItem("petshop-user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+    // Check active sessions and subscribe to auth changes
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        mapUser(session.user);
+      }
+      setIsLoading(false);
+    };
+
+    fetchSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        mapUser(session.user);
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const mapUser = (sbUser: SupabaseUser) => {
+    setUser({
+      id: sbUser.id,
+      name: sbUser.user_metadata.name || sbUser.email?.split('@')[0] || "Usuário",
+      email: sbUser.email || "",
+      avatar: sbUser.user_metadata.avatar_url,
+      role: sbUser.user_metadata.role || 'user'
+    });
+  };
 
   const login = async (email: string, pass: string) => {
     setIsLoading(true);
-    // Mock login delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Check if user exists in local storage "users" DB (mock)
-    const users = JSON.parse(localStorage.getItem("petshop-all-users") || "[]");
-    const found = users.find((u: any) => u.email === email && u.password === pass);
-    
-    if (found) {
-      const userData = { id: found.id, name: found.name, email: found.email, avatar: found.name[0] };
-      setUser(userData);
-      localStorage.setItem("petshop-user", JSON.stringify(userData));
-    } else {
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    if (error) {
       setIsLoading(false);
-      throw new Error("Email ou senha inválidos.");
+      throw error;
     }
-    setIsLoading(false);
   };
 
   const register = async (name: string, email: string, pass: string) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    const users = JSON.parse(localStorage.getItem("petshop-all-users") || "[]");
-    if (users.find((u: any) => u.email === email)) {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: pass,
+      options: {
+        data: { name, role: 'user' }
+      }
+    });
+    if (error) {
       setIsLoading(false);
-      throw new Error("Este e-mail já está sendo usado.");
+      throw error;
     }
-    
-    const newUser = { id: Math.random().toString(36).substr(2, 9), name, email, password: pass };
-    users.push(newUser);
-    localStorage.setItem("petshop-all-users", JSON.stringify(users));
-    
-    const userData = { id: newUser.id, name: newUser.name, email: newUser.email, avatar: newUser.name[0] };
-    setUser(userData);
-    localStorage.setItem("petshop-user", JSON.stringify(userData));
-    setIsLoading(false);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem("petshop-user");
   };
 
   return (
@@ -84,6 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return context;
 };

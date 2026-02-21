@@ -202,7 +202,7 @@ const AdminDashboard = () => {
                       orders.map((order) => (
                         <TableRow key={order.id}>
                           <TableCell className="font-mono text-xs">#{order.id}</TableCell>
-                          <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                          <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
                           <TableCell>R$ {order.total.toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="flex w-fit items-center gap-1">
