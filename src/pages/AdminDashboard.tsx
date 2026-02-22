@@ -31,10 +31,11 @@ const AdminDashboard = () => {
   const { orders } = useOrders();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // In a real app, only actual admins could access this
-  if (!user) {
-    return <Navigate to="/auth" />;
+  // SEGURANÇA: Bloqueia acesso se não for admin
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/" />;
   }
+
 
   const handleDeleteProduct = (id: string) => {
     if (confirm("Tem certeza que deseja excluir este produto?")) {

@@ -92,9 +92,14 @@ const Header = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/pedidos">Meus Pedidos</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin" className="text-primary font-bold">Painel Admin</Link>
-                  </DropdownMenuItem>
+                  {user.role === "admin" && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="text-primary font-bold">
+                        Painel Admin
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
 
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={logout}>

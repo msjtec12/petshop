@@ -92,16 +92,58 @@ const Checkout = () => {
                 <CardDescription>Sua transação é protegida por criptografia de ponta a ponta.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <Label>Tipo de Cliente</Label>
+                    <div className="flex gap-2">
+                      <Button 
+                        type="button" 
+                        variant={formData.type === 'pf' ? 'default' : 'outline'}
+                        className="flex-1"
+                        onClick={() => setFormData({...formData, type: 'pf'})}
+                      >PF</Button>
+                      <Button 
+                        type="button" 
+                        variant={formData.type === 'pj' ? 'default' : 'outline'}
+                        className="flex-1"
+                        onClick={() => setFormData({...formData, type: 'pj'})}
+                      >PJ</Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="document">{formData.type === 'pf' ? 'CPF' : 'CNPJ'}</Label>
+                    <Input 
+                      id="document" 
+                      required 
+                      placeholder={formData.type === 'pf' ? '000.000.000-00' : '00.000.000/0000-00'} 
+                      value={formData.document}
+                      onChange={e => setFormData({...formData, document: e.target.value})}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="address">Endereço de Entrega</Label>
+                  <Label htmlFor="phone">Telefone / WhatsApp</Label>
+                  <Input 
+                    id="phone" 
+                    required 
+                    placeholder="(00) 00000-0000" 
+                    value={formData.phone}
+                    onChange={e => setFormData({...formData, phone: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address">Endereço de Entrega Completo</Label>
                   <Input 
                     id="address" 
                     required 
-                    placeholder="Rua, Número, Bairro, Cidade - UF" 
+                    placeholder="Rua, Número, Bairro, CEP, Cidade - UF" 
                     value={formData.address}
                     onChange={e => setFormData({...formData, address: e.target.value})}
                   />
                 </div>
+
 
                 <div className="space-y-2">
                   <Label htmlFor="cardNumber">Número do Cartão</Label>
