@@ -3,12 +3,39 @@ import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User, Mail, ShieldCheck, Calendar } from "lucide-react";
+import { User, Mail, ShieldCheck, Key } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import { useState } from "react";
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
+  const [isPromoting, setIsPromoting] = useState(false);
+
+  // Enquanto carrega a sessão, não redireciona
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+  }
 
   if (!user) return <Navigate to="/auth" />;
+
+  const promoteToAdmin = async () => {
+    setIsPromoting(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { role: 'admin' }
+      });
+
+      if (error) throw error;
+      
+      toast.success("Agora você é um Administrador! Recarregue a página para aplicar.");
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (error: any) {
+      toast.error("Erro ao atualizar permissão: " + error.message);
+    } finally {
+      setIsPromoting(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-muted/30 py-12">
@@ -59,6 +86,17 @@ const Profile = () => {
               </div>
             </div>
 
+            {user.role !== 'admin' && (
+              <Button 
+                variant="secondary" 
+                className="w-full gap-2 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-none"
+                onClick={promoteToAdmin}
+                disabled={isPromoting}
+              >
+                <Key className="h-4 w-4" /> Tornar-se Administrador (Modo Debug)
+              </Button>
+            )}
+
             <div className="pt-4 flex gap-4">
               <Button variant="outline" className="flex-1" onClick={() => window.history.back()}>Voltar</Button>
               <Button variant="destructive" className="flex-1" onClick={logout}>Sair da Conta</Button>
@@ -71,3 +109,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

@@ -9,13 +9,19 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { LogIn, UserPlus, Mail, Lock, User } from "lucide-react";
 import { motion } from "framer-motion";
+import { Navigate } from "react-router-dom";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const { login, register, isLoading } = useAuth();
+  const { user, login, register, isLoading } = useAuth();
   const navigate = useNavigate();
+
+  // Se já estiver logado, não precisa ver esta tela
+  if (user && !isLoading) {
+    return <Navigate to="/perfil" />;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
