@@ -11,15 +11,20 @@ export interface Order {
   status: "pendente" | "pago" | "enviado" | "entregue" | "cancelado";
   created_at: string;
   shipping_address: string;
+  shipping_method?: string;
+  shipping_fee?: number;
+  document?: string;
+  phone?: string;
 }
 
 interface OrdersContextType {
   orders: Order[];
   isLoading: boolean;
-  createOrder: (userId: string, items: CartItem[], total: number, address: string, document: string, phone: string) => Promise<Order>;
+  createOrder: (userId: string, items: CartItem[], total: number, address: string, document: string, phone: string, shippingMethod: string, shippingFee: number) => Promise<Order>;
   getOrdersByUser: (userId: string) => Order[];
   refreshOrders: () => Promise<void>;
 }
+
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
@@ -46,7 +51,7 @@ export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     fetchOrders();
   }, []);
 
-  const createOrder = async (userId: string, items: CartItem[], total: number, address: string, document: string, phone: string): Promise<Order> => {
+  const createOrder = async (userId: string, items: CartItem[], total: number, address: string, document: string, phone: string, shippingMethod: string, shippingFee: number): Promise<Order> => {
     const newOrder = {
       user_id: userId,
       items: items, // Supabase handles JSON array
@@ -54,8 +59,11 @@ export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       status: "pendente",
       shipping_address: address,
       document,
-      phone
+      phone,
+      shipping_method: shippingMethod,
+      shipping_fee: shippingFee
     };
+
 
 
     

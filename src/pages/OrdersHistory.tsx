@@ -85,11 +85,17 @@ const OrdersHistory = () => {
                         )}
                       </div>
                       <div className="text-right">
+                        {order.shipping_method && (
+                          <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">
+                            🚚 {order.shipping_method}
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground">Total do pedido</p>
                         <p className="text-lg font-bold text-foreground">
                           R$ {order.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                         </p>
                       </div>
+
                     </div>
                   </CardContent>
                 </Card>
