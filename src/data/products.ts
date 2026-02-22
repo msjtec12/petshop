@@ -13,6 +13,7 @@ export interface Product {
   badge?: "novo" | "promoção" | "mais vendido";
   variations?: { label: string; options: string[] }[];
   inStock: boolean;
+  weight?: number; // Peso em kg para cálculo de frete
 }
 
 export const categories = [
@@ -47,6 +48,7 @@ export const products: Product[] = [
     badge: "mais vendido",
     variations: [{ label: "Peso", options: ["3kg", "7.5kg", "15kg"] }],
     inStock: true,
+    weight: 15.0
   },
   {
     id: "2",
@@ -62,6 +64,7 @@ export const products: Product[] = [
     badge: "mais vendido",
     variations: [{ label: "Tamanho", options: ["P", "M", "G"] }],
     inStock: true,
+    weight: 0.3
   },
   {
     id: "3",
@@ -78,6 +81,7 @@ export const products: Product[] = [
     badge: "promoção",
     variations: [{ label: "Peso", options: ["1kg", "3kg", "10kg"] }],
     inStock: true,
+    weight: 10.0
   },
   {
     id: "4",
@@ -92,6 +96,7 @@ export const products: Product[] = [
     reviewCount: 98,
     badge: "novo",
     inStock: true,
+    weight: 0.5
   },
   {
     id: "5",
@@ -108,6 +113,7 @@ export const products: Product[] = [
     badge: "promoção",
     variations: [{ label: "Tamanho", options: ["PP", "P", "M", "G"] }],
     inStock: true,
+    weight: 0.2
   },
   {
     id: "6",
@@ -123,6 +129,7 @@ export const products: Product[] = [
     badge: "mais vendido",
     variations: [{ label: "Tamanho", options: ["P", "M", "G", "GG"] }],
     inStock: true,
+    weight: 2.5
   },
   {
     id: "7",
@@ -138,6 +145,7 @@ export const products: Product[] = [
     reviewCount: 145,
     badge: "promoção",
     inStock: true,
+    weight: 5.0
   },
   {
     id: "8",
@@ -153,6 +161,7 @@ export const products: Product[] = [
     badge: "mais vendido",
     variations: [{ label: "Peso do Pet", options: ["até 10kg", "10-20kg", "20-40kg", "40kg+"] }],
     inStock: true,
+    weight: 0.1
   },
 ];
 

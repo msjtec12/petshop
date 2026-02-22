@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useBranding } from "@/contexts/BrandingContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { LogIn, UserPlus, Mail, Lock, User } from "lucide-react";
+import { LogIn, UserPlus, Mail, Lock, User, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { Navigate } from "react-router-dom";
 
@@ -15,7 +16,9 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const { user, login, register, isLoading } = useAuth();
+  const { settings } = useBranding();
   const navigate = useNavigate();
 
   // Se já estiver logado, não precisa ver esta tela
@@ -37,7 +40,7 @@ const Auth = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register(name, email, password);
+      await register(name, email, password, phone);
       toast.success("Conta criada com sucesso!");
       navigate("/");
     } catch (error: any) {
@@ -56,7 +59,7 @@ const Auth = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
             <span className="text-3xl">🐾</span>
           </div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Bem-vindo à PetShop</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground">Bem-vindo à {settings.name}</h1>
           <p className="text-muted-foreground mt-2">Sua loja favorita para pets</p>
         </div>
 
@@ -137,6 +140,21 @@ const Auth = () => {
                         className="pl-10"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="reg-phone">WhatsApp/Telefone</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        id="reg-phone" 
+                        type="tel" 
+                        placeholder="(11) 99999-9999" 
+                        className="pl-10"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
                         required
                       />
                     </div>

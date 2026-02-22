@@ -5,10 +5,13 @@ import { toast } from "sonner";
 
 interface ProductsContextType {
   products: Product[];
+  categories: { id: string; name: string; icon: string; animal: string }[];
   isLoading: boolean;
   addProduct: (product: Omit<Product, "id">) => Promise<void>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
+  addCategory: (category: { name: string; icon: string }) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
   refreshProducts: () => Promise<void>;
 }
 
@@ -16,6 +19,7 @@ const ProductsContext = createContext<ProductsContextType | undefined>(undefined
 
 export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string; icon: string; animal: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const mapFromDB = (p: any): Product => ({
@@ -32,7 +36,8 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     reviewCount: p.review_count,
     badge: p.badge,
     variations: p.variations,
-    inStock: p.in_stock
+    inStock: p.in_stock,
+    weight: p.weight ? parseFloat(p.weight) : undefined
   });
 
   const mapToDB = (p: Partial<Product>) => {
@@ -50,6 +55,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (p.badge !== undefined) dbObj.badge = p.badge;
     if (p.variations !== undefined) dbObj.variations = p.variations;
     if (p.inStock !== undefined) dbObj.in_stock = p.inStock;
+    if (p.weight !== undefined) dbObj.weight = p.weight;
     return dbObj;
   };
 
@@ -71,8 +77,23 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsLoading(false);
   };
 
+  const fetchCategories = async () => {
+    const { data, error } = await supabase.from('categories').select('*');
+    if (error) {
+      console.error("Error fetching categories:", error);
+      const { categories: initialCats } = await import("@/data/products");
+      setCategories(initialCats);
+    } else if (data && data.length > 0) {
+      setCategories(data);
+    } else {
+      const { categories: initialCats } = await import("@/data/products");
+      setCategories(initialCats);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const addProduct = async (p: Omit<Product, "id">) => {
@@ -114,13 +135,42 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setProducts(prev => prev.filter(item => item.id !== id));
   };
 
+  const addCategory = async (cat: { name: string; icon: string }) => {
+    const newCat = { 
+      id: cat.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-'), 
+      name: cat.name, 
+      icon: cat.icon || "🐾", 
+      animal: "all" 
+    };
+    
+    const { data, error } = await supabase.from('categories').insert([newCat]).select();
+    
+    if (error) {
+      console.warn("Supabase category error, saving locally");
+      setCategories(prev => [...prev, newCat]);
+    } else {
+      setCategories(prev => [...prev, data[0]]);
+    }
+    toast.success("Categoria criada com sucesso!");
+  };
+
+  const deleteCategory = async (id: string) => {
+    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (error) console.warn("Supabase delete category error");
+    setCategories(prev => prev.filter(c => c.id !== id));
+    toast.success("Categoria removida!");
+  };
+
   return (
     <ProductsContext.Provider value={{ 
       products, 
+      categories,
       isLoading, 
       addProduct, 
       updateProduct, 
       deleteProduct, 
+      addCategory,
+      deleteCategory,
       refreshProducts: fetchProducts 
     }}>
       {children}

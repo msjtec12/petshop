@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
 import { motion } from "framer-motion";
+import { useBranding } from "@/contexts/BrandingContext";
 
 const Newsletter = () => {
+  const { settings } = useBranding();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -20,7 +22,7 @@ const Newsletter = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl font-display font-bold text-primary-foreground mb-3">
-            Receba ofertas exclusivas 🐾
+            Receba novidades da {settings.name} 🐾
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-md mx-auto">
             Cadastre-se e ganhe 10% OFF na primeira compra!

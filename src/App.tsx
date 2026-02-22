@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { OrdersProvider } from "@/contexts/OrdersContext";
 import { ProductsProvider } from "@/contexts/ProductsContext";
+import { BrandingProvider } from "@/contexts/BrandingContext";
+import { AppointmentsProvider } from "@/contexts/AppointmentsContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
@@ -20,47 +22,52 @@ import Checkout from "./pages/Checkout";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrdersHistory from "./pages/OrdersHistory";
 import Profile from "./pages/Profile";
+import Services from "@/pages/Services";
 import NotFound from "./pages/NotFound";
-
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <ProductsProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <OrdersProvider>
-                  <Header />
-                  <CartSidebar />
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/produtos" element={<Products />} />
-                    <Route path="/produto/:id" element={<ProductDetail />} />
-                    <Route path="/carrinho" element={<Cart />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/checkout" element={<Checkout />} />
-                    <Route path="/pedidos" element={<OrdersHistory />} />
-                    <Route path="/perfil" element={<Profile />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="*" element={<NotFound />} />
-
-                  </Routes>
-                  <Footer />
-                </OrdersProvider>
-              </WishlistProvider>
-            </CartProvider>
-          </ProductsProvider>
-        </AuthProvider>
+        <BrandingProvider>
+          <AuthProvider>
+            <ProductsProvider>
+              <OrdersProvider>
+                <AppointmentsProvider>
+                  <CartProvider>
+                    <WishlistProvider>
+                      <Toaster />
+                      <Sonner />
+                      <Header />
+                      <CartSidebar />
+                      <main className="flex-1">
+                        <Routes>
+                          <Route path="/" element={<Index />} />
+                          <Route path="/produtos" element={<Products />} />
+                          <Route path="/produto/:id" element={<ProductDetail />} />
+                          <Route path="/servicos" element={<Services />} />
+                          <Route path="/carrinho" element={<Cart />} />
+                          <Route path="/auth" element={<Auth />} />
+                          <Route path="/checkout" element={<Checkout />} />
+                          <Route path="/pedidos" element={<OrdersHistory />} />
+                          <Route path="/perfil" element={<Profile />} />
+                          <Route path="/admin" element={<AdminDashboard />} />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </main>
+                      <Footer />
+                    </WishlistProvider>
+                  </CartProvider>
+                </AppointmentsProvider>
+              </OrdersProvider>
+            </ProductsProvider>
+          </AuthProvider>
+        </BrandingProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
-
 
 export default App;

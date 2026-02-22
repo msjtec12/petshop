@@ -1,53 +1,34 @@
-/**
- * Serviço de Integração com Logística (Simulado)
- * Lalamove / Loggi
- */
+import { supabase } from "@/lib/supabase";
 
 export interface ShippingOption {
   id: string;
   name: string;
   price: number;
-  deliveryTime: string; // Ex: "45-60 min"
-  provider: 'lalamove' | 'loggi' | 'proprio';
+  deliveryTime: string;
 }
 
-export const calculateShipping = async (cep: string, itemsCount: number): Promise<ShippingOption[]> => {
-  // Simula uma chamada de API que demora 1 segundo
-  await new Promise(resolve => setTimeout(resolve, 1200));
+export const calculateShipping = async (cep: string, itemsCount: number, totalWeight: number): Promise<ShippingOption[]> => {
+  // SEGURANÇA: O cálculo agora é feito no servidor (Edge Function)
+  // Evita que o usuário manipule o preço do frete via console do navegador
+  const { data, error } = await supabase.functions.invoke('calculate-shipping', {
+    body: { cep, itemsCount, totalWeight }
+  });
 
-  // Lógica fictícia: se o CEP for de SP (01000-000), o frete é mais barato
-  const isSP = cep.startsWith('0');
-  
-  const options: ShippingOption[] = [
-    {
-      id: 'loggi-express',
-      name: 'Loggi Express (Motoboy)',
-      price: isSP ? 12.50 : 25.00,
-      deliveryTime: '40-60 min',
-      provider: 'loggi'
-    },
-    {
-      id: 'lalamove-van',
-      name: 'Lalamove Delivery',
-      price: isSP ? 18.90 : 35.00,
-      deliveryTime: '30-50 min',
-      provider: 'lalamove'
-    },
-    {
-      id: 'entrega-petshop',
-      name: 'Entrega Própria PataFeliz',
-      price: 0,
-      deliveryTime: 'Até 2 horas',
-      provider: 'proprio'
-    }
-  ];
+  if (error) {
+    console.error("Erro ao calcular frete seguro:", error.message);
+    return [];
+  }
 
-  // Se o carrinho for muito pesado ou CEP longe, podemos filtrar opções
-  return options;
+  return data;
 };
 
 export const createDeliveryOrder = async (orderId: string, address: string, provider: string) => {
-  // Em produção, isso chamaria o Webhook da Loggi/Lalamove
-  console.log(`Solicitando motoboy para pedido ${orderId} via ${provider}`);
-  return { success: true, trackingUrl: 'https://track.loggi.com/mock' };
+  // PROTEÇÃO: Chamada direta de backend para backend (Loggi/Lalamove)
+  const { data, error } = await supabase.functions.invoke('process-delivery', {
+    body: { orderId, address, provider }
+  });
+
+  if (error) throw error;
+  return data;
 };
+
